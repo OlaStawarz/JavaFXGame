@@ -20,35 +20,31 @@ import java.util.ArrayList;
 public class Main extends Application {
 
     private double newX = 0;
-    private ArrayList drop = new ArrayList();
+    private ArrayList<Circle> drop = new ArrayList<Circle>();
 
-    double speed = 1;
-    double falling = 3000;
-    Rectangle r;
+    private Rectangle r;
+    private Pane root;
 
-    AnimationTimer timer;
-    Pane root;
-    double x;
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
-        //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-       root = new Pane();
+    public void start(Stage primaryStage) throws Exception {
+        AnimationTimer timer;
+        double falling = 3000;
+
+        root = new Pane();
         r = rectangle();
         root.getChildren().add(r);
 
         Scene scene = new Scene(root, 600, 600);
 
-        scene.setOnKeyPressed(e ->{
-            if(e.getCode() == KeyCode.RIGHT){
-                if (newX != 265){
+        scene.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.RIGHT) {
+                if (newX != 264) {
                     newX = newX + 8;
                     r.setTranslateX(newX);
                 }
-            }
-            else if(e.getCode() == KeyCode.LEFT){
-                if (newX != -265)
-                {
+            } else if (e.getCode() == KeyCode.LEFT) {
+                if (newX != -264) {
                     newX = newX - 8;
                     r.setTranslateX(newX);
                 }
@@ -56,10 +52,10 @@ public class Main extends Application {
 
         });
 
-      Timeline timeline = new Timeline(new KeyFrame(Duration.millis(falling), event -> {
-            speed += falling / 10000;
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(falling), event -> {
+            //speed += falling / 10000;
             drop.add(circle());
-            root.getChildren().add(((Node)drop.get(drop.size() -1)));
+            root.getChildren().add((drop.get(drop.size() - 1)));
         }));
 
         timeline.setCycleCount(1000);
@@ -80,14 +76,14 @@ public class Main extends Application {
 
     private Circle circle() {
         Circle circle = new Circle();
-        circle.setLayoutX(rand(0, 600));
+        circle.setLayoutX(rand());
         circle.setFill(Color.BLUE);
         circle.setLayoutY(1);
         circle.setRadius(6);
         return circle;
     }
 
-    private Rectangle rectangle(){
+    private Rectangle rectangle() {
         Rectangle r = new Rectangle();
         r.setX(265);
         r.setY(560);
@@ -98,18 +94,22 @@ public class Main extends Application {
         return r;
     }
 
-    private int rand(int min, int max) {
-        return (int)(Math.random() * max + min);
+    private int rand() {
+        int min = 0;
+        int max = 600;
+        return (int) (Math.random() * max + min);
     }
 
-    private void gameUpdate(){
+    private void gameUpdate() {
 
         //r.getLayoutX(newX);
+        double speed = 1;
 
-        for(int i = 0; i < drop.size(); i++) {
-            ((Circle) drop.get(i)).setLayoutY(((Circle) drop.get(i)).getLayoutY()
-                    + speed + ((Circle) drop.get(i)).getLayoutY() / 150);
-           /*if((((Circle) drop.get(i)).getLayoutX() > x && ((Circle) drop.get(i)).getLayoutX() < x + 70) &&
+        for (int i = 0; i < drop.size(); i++) {
+            (drop.get(i)).setLayoutY(( drop.get(i)).getLayoutY() + speed + (drop.get(i)).getLayoutY() / 200);
+
+
+            /*if((((Circle) drop.get(i)).getLayoutX() > x && ((Circle) drop.get(i)).getLayoutX() < x + 70) &&
                     ((Circle) drop.get(i)).getLayoutY() >= 400  ) {
                 root.getChildren().remove(((Circle) drop.get(i)));
                 drop.remove(i);
