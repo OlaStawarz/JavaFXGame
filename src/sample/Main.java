@@ -32,12 +32,14 @@ public class Main extends Application
     private Shapes shapes = new Shapes();
     private ArrayList<Shape> drop = new ArrayList<>();
     private Label labelCountCircle, labelCountSquare, labelCountTriangle, labelCount;
-    private int counterCircle = 5, counterSquare = 5, counterTriangle = 5;
+    private int counterCircle = 5, counterSquare = 5, counterTriangle = 5, counterSpeed = 0;
     private Pane layout2, layout3;
     private Label label;
     public AnimationTimer timer;
     private Circle gameOneCircle;
     private Path gameOneTriangle;
+    public double speed = 1; //szybkość spadania
+    public double falling;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -64,23 +66,22 @@ public class Main extends Application
         button2.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                 /*       layout3 = new Pane();
+                layout3 = new Pane();
                 scene3 = new Scene(layout3, 800, 600);
                 r = shapes.rectangle();
                 layout3.getChildren().add(r);
                 window.setScene(scene3);
                 addLabel(layout3);
                 move(scene3);
-                TimeLine(layout3);
+                TimeLine2(layout3);
                 AnimationTimer timer;
                 timer = new AnimationTimer(){
-
                     @Override
                     public void handle(long arg0){
-                        gameUpdate(layout3);
+                        gameUpdate1(layout3);
                     }
                 };
-                timer.start(); */
+                timer.start();
             }
         });
 
@@ -112,6 +113,24 @@ public class Main extends Application
         window.setScene(scene1);
         window.show();
 
+    }
+
+    private void gameUpdate1(Pane x) {
+
+
+        //System.out.println(root.getLayoutX());
+        for (int i = 0; i < drop.size(); i++) {
+            (drop.get(i)).setLayoutY(( drop.get(i)).getLayoutY() + speed + (drop.get(i)).getLayoutY() / 600);
+
+            //System.out.println(drop.get(i).getLayoutY());
+            if ((drop.get(i).getLayoutY() > x.getLayoutY() + r.getY())
+                    && drop.get(i).getLayoutX() > (newX + 264) && drop.get(i).getLayoutX() < (newX + 264 + 70)) {
+                counterSpeed++;
+                labelCount.setText(String.valueOf(counterSpeed));
+                x.getChildren().remove((drop.get(i)));
+                drop.remove(i);
+            }
+        }
     }
 
     private void gameUpdate(Pane x) {
@@ -223,7 +242,7 @@ public class Main extends Application
     private void TimeLine(Pane x){
         double falling = 3000; //określenie częstotliwości spadania (ms)
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(falling), event -> {
-            //speed += falling / 10000;
+            //speed += falling / 1000;
             int random = (int)(Math.random() * 100);
             if(random < 30)
                 drop.add(shapes.circle());
@@ -233,6 +252,30 @@ public class Main extends Application
                 drop.add(shapes.triangle());
             x.getChildren().add((drop.get(drop.size() - 1)));
 
+        }));
+        timeline.setCycleCount(1000);
+        timeline.play();
+    }
+
+    public void TimeLine2(Pane x){
+        falling = 2000; //określenie częstotliwości spadania (ms)
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(falling), event -> {
+                if (speed < 1.5)
+                    speed += 0.05;
+                //System.out.println(speed);
+                int random = (int) (Math.random() * 100);
+                if (random < 30)
+                    drop.add(shapes.circle());
+                else if (random > 30 && random < 60)
+                    drop.add(shapes.square());
+                else
+                    drop.add(shapes.triangle());
+                x.getChildren().add((drop.get(drop.size() - 1)));
+                //falling -= 500;
+                //System.out.println(falling);
+                System.out.println(falling);
+                if (falling > 1000)
+                    falling -= 150;
         }));
         timeline.setCycleCount(1000);
         timeline.play();
