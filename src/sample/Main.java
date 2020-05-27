@@ -4,14 +4,13 @@ import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.Scene;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -22,7 +21,7 @@ import java.util.*;
 public class Main extends Application {
 
     private double newX = 0;
-    private ArrayList<Circle> drop = new ArrayList<Circle>();
+    private ArrayList<Shape> drop = new ArrayList<>();
     private Rectangle r;
     private Pane root;
     private Shapes shapes = new Shapes();
@@ -70,10 +69,19 @@ public class Main extends Application {
 
         });
 
+       /* ArrayList<Shape> ksztalt = new ArrayList<>();
+        ksztalt.add(shapes.prostokat());
+        ksztalt.add(shapes.circle());*/
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(falling), event -> {
             //speed += falling / 10000;
-            drop.add(shapes.circle());
+            int random = (int)(Math.random() * 100);
+            if(random < 30)
+                drop.add(shapes.circle());
+            else if (random > 30 && random < 60)
+                drop.add(shapes.square());
+            else
+                drop.add(shapes.triangle());
             root.getChildren().add((drop.get(drop.size() - 1)));
         }));
 
@@ -104,16 +112,14 @@ public class Main extends Application {
             //System.out.println(drop.get(i).getLayoutY());
             if ((drop.get(i).getLayoutY() > root.getLayoutY() + r.getY())
                     && drop.get(i).getLayoutX() > (newX + 264) && drop.get(i).getLayoutX() < (newX + 264 + 70)) {
-                if (drop.get(i).getFill() == Color.GREEN) {
+                //if (drop.get(i).getFill() == Color.GREEN) {
+
                     counter++;
                     labelCount.setText(Integer.toString(counter));
-                }
+                //}
                 root.getChildren().remove((drop.get(i)));
                 drop.remove(i);
-
-
             }
-
         }
     }
 
