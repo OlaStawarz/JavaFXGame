@@ -7,12 +7,9 @@ import java.util.ArrayList;
 
 public class Shapes {
 
-    private Circle circle = new Circle();
-    private Rectangle r = new Rectangle();
-    private Rectangle s = new Rectangle();
-    private Path path = new Path();
 
     public Circle circle() {
+        Circle circle = new Circle();
         circle.setLayoutX(rand());
         circle.setFill(randColor());
         circle.setLayoutY(1);
@@ -21,6 +18,7 @@ public class Shapes {
     }
 
     public Rectangle rectangle() {
+        Rectangle r = new Rectangle();
         r.setX(265);
         r.setY(560);
         r.setWidth(70);
@@ -31,6 +29,7 @@ public class Shapes {
     }
 
     public Rectangle square() {
+        Rectangle s = new Rectangle();
         s.setLayoutX(rand());
         s.setLayoutY(1);
         s.setFill(randColor());
@@ -40,7 +39,7 @@ public class Shapes {
     }
 
     public Path triangle() {
-
+        Path path = new Path();
         MoveTo moveTo = new MoveTo();
         moveTo.setX(25);
         moveTo.setY(20);
