@@ -1,13 +1,18 @@
 package sample;
 
+import java.io.*;
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Path;
@@ -19,8 +24,15 @@ import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
 import javafx.scene.shape.Shape;
 import javafx.util.Duration;
+import javafx.scene.control.TextField;
+import javafx.event.ActionEvent;
+import javafx.util.Pair;
 
-import java.awt.*;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Main extends Application
@@ -31,6 +43,7 @@ public class Main extends Application
     private double newX = 0;
     private Shapes shapes = new Shapes();
     private ArrayList<Shape> drop = new ArrayList<>();
+    private ArrayList<Pair> users = new ArrayList<>();
     private Label labelCountCircle, labelCountSquare, labelCountTriangle, labelCount;
     private int counterCircle = 5, counterSquare = 5, counterTriangle = 5, counterSpeed = 0;
     private Pane layout2, layout3;
@@ -40,18 +53,47 @@ public class Main extends Application
     private Path gameOneTriangle;
     public double speed = 1; //szybkość spadania
     public double falling;
+    private  TextField name;
+    Pair<String, Integer> u;
+
 
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-        window = primaryStage;
-        VBox layout1 = new VBox(20);
-        Button button3 = new Button("Ilosc");
-        Button button2 = new Button("Szybkosc");
-        Label label1 = new Label("Welcome in first scene");
 
-        layout1.getChildren().addAll(label1, button2, button3);
-        scene1 = new Scene(layout1, 200, 200);
+        window = primaryStage;
+        Pane layout1 = new Pane();
+        Button button3 = new Button("ZBIERANIE");
+        Button button2 = new Button("REFLEKS");
+        Button buttonRank = new Button("Ranking");
+        button2.setTranslateX(10);
+        Label label1 = new Label("Imię: ");
+        Label labelGame = new Label("Wybierz tryb rozgrywki: ");
+        name = new TextField();
+
+        label1.setTranslateX(180);
+        label1.setTranslateY(200);
+        label1.setFont(new Font("Verdana", 20));
+        labelGame.setTranslateX(170);
+        labelGame.setTranslateY(250);
+        labelGame.setFont(new Font("Verdana", 20));
+        name.setTranslateX(250);
+        name.setTranslateY(200);
+        button2.setMinSize(100, 50);
+        button2.setTranslateX(190);
+        button2.setTranslateY(300);
+        //button2.setFont(new Font("Verdana", 20));
+        button3.setTranslateX(300);
+        button3.setTranslateY(300);
+        //button3.setFont(new Font("Verdana", 20));
+        button3.setMinSize(100, 50);
+
+        buttonRank.setMinSize(100, 50);
+        buttonRank.setTranslateX(250);
+        buttonRank.setTranslateY(400);
+
+        layout1.getChildren().addAll(label1, labelGame, name, button2, button3, buttonRank);
+        scene1 = new Scene(layout1, 600, 600);
 
         layout3 = new Pane();
         scene3 = new Scene(layout3, 800, 600);
@@ -62,6 +104,10 @@ public class Main extends Application
         r = shapes.rectangle();
         layout2.getChildren().add(r);
         layout3.getChildren().add(r);
+
+
+
+
 
         button2.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -103,6 +149,7 @@ public class Main extends Application
                     @Override
                     public void handle(long arg0){
                         gameUpdate(layout2);
+
                     }
                 };
                 timer.start();
@@ -112,6 +159,9 @@ public class Main extends Application
 
         window.setScene(scene1);
         window.show();
+
+
+
 
     }
 
@@ -123,13 +173,19 @@ public class Main extends Application
             (drop.get(i)).setLayoutY(( drop.get(i)).getLayoutY() + speed + (drop.get(i)).getLayoutY() / 600);
 
             //System.out.println(drop.get(i).getLayoutY());
-            if ((drop.get(i).getLayoutY() > x.getLayoutY() + r.getY())
+            if ((drop.get(i).getLayoutY() > (r.getY() - 10)) && drop.get(i).getLayoutY() < x.getLayoutY() + 600
                     && drop.get(i).getLayoutX() > (newX + 264) && drop.get(i).getLayoutX() < (newX + 264 + 70)) {
                 counterSpeed++;
                 labelCount.setText(String.valueOf(counterSpeed));
                 x.getChildren().remove((drop.get(i)));
                 drop.remove(i);
+            } else {
+                u = new Pair<>(name.getText(), counterSpeed);
+                users.add(u);
+
+
             }
+
         }
     }
 
@@ -184,8 +240,12 @@ public class Main extends Application
         }
     }
 
+
+
+
+
     private void addLabel(Pane x){
-        label = new Label("Counter: ");
+        label = new Label("Licznik: ");
         label.setFont(new javafx.scene.text.Font("Arial", 30));
         label.setTranslateX(610);
         label.setTranslateY(100);
@@ -260,7 +320,7 @@ public class Main extends Application
     public void TimeLine2(Pane x){
         falling = 2000; //określenie częstotliwości spadania (ms)
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(falling), event -> {
-                if (speed < 1.5)
+                if (speed < 1.8)
                     speed += 0.05;
                 //System.out.println(speed);
                 int random = (int) (Math.random() * 100);
@@ -297,6 +357,7 @@ public class Main extends Application
 
         });
     }
+
 
     public static void main(String[] args) {
         launch(args);
