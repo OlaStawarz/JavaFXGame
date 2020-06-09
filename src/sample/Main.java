@@ -129,14 +129,14 @@ public class Main extends Application
         layout4.getChildren().addAll(labelLost, labelLost1, buttonNewGame_Collect, buttonMainMenu);
         scene4 = new Scene(layout4, 400, 220);
 
-        Pane layout5 = new Pane();
+      /*  Pane layout5 = new Pane();
         Button buttonNewGame_Reflex = new Button("Nowa gra");
         buttonNewGame_Reflex.setMinSize(80, 50);
         buttonNewGame_Reflex.setTranslateX(60);
         buttonNewGame_Reflex.setTranslateY(150);
         layout5.getChildren().addAll(labelLost, labelLost1, buttonNewGame_Reflex, buttonMainMenu);
-        scene5 = new Scene(layout5, 400, 220);
-
+        scene5 = new Scene(layout4, 400, 220);
+*/
         buttonReflex.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -206,30 +206,6 @@ public class Main extends Application
             }
         });
 
-        buttonNewGame_Reflex.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                timelineReflex.stop();
-                layout3.getChildren().clear();
-                r = shapes.rectangle();
-                layout3.getChildren().add(r);
-                window.setScene(scene3);
-                newX = 0;
-                //gameCollect(layout3);
-                move(scene3);
-                TimeLine_reflex(layout3);
-
-                timer_reflex = new AnimationTimer(){
-
-                    @Override
-                    public void handle(long arg0){
-                        gameUpdate_Reflex(layout3);
-                    }
-                };
-                timer_reflex.start();
-
-            }
-        });
 
         buttonMainMenu.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -250,24 +226,17 @@ public class Main extends Application
     private void gameUpdate_Reflex(Pane x) {
 
         for (int i = 0; i < drop.size(); i++) {
-            System.out.println(drop.get(i).getLayoutY());
             (drop.get(i)).setLayoutY((drop.get(i)).getLayoutY() + speed + (drop.get(i)).getLayoutY() / 600);
             if ((drop.get(i).getLayoutY() > (r.getY() - 10)) && drop.get(i).getLayoutY() < x.getLayoutY() + 600
                     && drop.get(i).getLayoutX() > (newX + 264) && drop.get(i).getLayoutX() < (newX + 264 + 70)) {
-
                 counterSpeed++;
                 labelCount.setText(String.valueOf(counterSpeed));
                 x.getChildren().remove((drop.get(i)));
                 drop.remove(i);
+            } else {
+                u = new Pair<>(name.getText(), counterSpeed);
+                users.add(u);
             }
-
-            /* else if ((drop.get(i).getLayoutY() < x.getLayoutY() + 600
-                    && drop.get(i).getLayoutX() > (newX + 264) && drop.get(i).getLayoutX() < (newX + 264 + 70))) {
-                layout3.getChildren().clear();
-                timer_reflex.stop();
-                window.setScene(scene5);
-                window.show();
-            }*/
         }
     }
 
