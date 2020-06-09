@@ -2,9 +2,11 @@ package sample;
 
 import java.io.*;
 import javafx.animation.AnimationTimer;
+import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -29,17 +31,14 @@ import javafx.event.ActionEvent;
 import javafx.util.Pair;
 
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class Main extends Application
 {
     private Stage window;
     private Rectangle r, gameOneSquare;
-    private Scene scene1, scene2, scene3;
+    private Scene scene1, scene2, scene3, scene4, scene5;
     private double newX = 0;
     private Shapes shapes = new Shapes();
     private ArrayList<Shape> drop = new ArrayList<>();
@@ -55,61 +54,90 @@ public class Main extends Application
     public double falling;
     private  TextField name;
     Pair<String, Integer> u;
+    private Timeline timelineCollect, timelineReflex;
+    private AnimationTimer timer_collect, timer_reflex;
+
 
 
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-
         window = primaryStage;
-        Pane layout1 = new Pane();
-        Button button3 = new Button("ZBIERANIE");
-        Button button2 = new Button("REFLEKS");
+        Pane layoutMain = new Pane();
+        Button buttonReflex = new Button("REFLEKS");
+        Button buttonCollect = new Button("ZBIERANIE");
+
         Button buttonRank = new Button("Ranking");
-        button2.setTranslateX(10);
-        Label label1 = new Label("Imię: ");
+        buttonRank.setTranslateX(10);
+        Label labelName = new Label("Imię: ");
         Label labelGame = new Label("Wybierz tryb rozgrywki: ");
         name = new TextField();
 
-        label1.setTranslateX(180);
-        label1.setTranslateY(200);
-        label1.setFont(new Font("Verdana", 20));
+        labelName.setTranslateX(180);
+        labelName.setTranslateY(200);
+        labelName.setFont(new Font("Verdana", 20));
         labelGame.setTranslateX(170);
         labelGame.setTranslateY(250);
         labelGame.setFont(new Font("Verdana", 20));
         name.setTranslateX(250);
         name.setTranslateY(200);
-        button2.setMinSize(100, 50);
-        button2.setTranslateX(190);
-        button2.setTranslateY(300);
+        buttonReflex.setMinSize(100, 50);
+        buttonReflex.setTranslateX(190);
+        buttonReflex.setTranslateY(300);
         //button2.setFont(new Font("Verdana", 20));
-        button3.setTranslateX(300);
-        button3.setTranslateY(300);
+        buttonCollect.setTranslateX(300);
+        buttonCollect.setTranslateY(300);
         //button3.setFont(new Font("Verdana", 20));
-        button3.setMinSize(100, 50);
+        buttonCollect.setMinSize(100, 50);
 
         buttonRank.setMinSize(100, 50);
         buttonRank.setTranslateX(250);
         buttonRank.setTranslateY(400);
 
-        layout1.getChildren().addAll(label1, labelGame, name, button2, button3, buttonRank);
-        scene1 = new Scene(layout1, 600, 600);
-
-        layout3 = new Pane();
-        scene3 = new Scene(layout3, 800, 600);
+        layoutMain.getChildren().addAll(labelName, labelGame, name, buttonReflex, buttonCollect, buttonRank);
+        scene1 = new Scene(layoutMain, 600, 600);
 
         layout2 = new Pane();
         scene2 = new Scene(layout2, 800, 600);
+
+        layout3 = new Pane();
+        scene3 = new Scene(layout3, 800, 600);
 
         r = shapes.rectangle();
         layout2.getChildren().add(r);
         layout3.getChildren().add(r);
 
+        Pane layout4 = new Pane();
+        Button buttonNewGame_Collect = new Button("Nowa gra");
+        Button buttonMainMenu = new Button("Powrót do głównego menu");
+        buttonNewGame_Collect.setMinSize(80, 50);
+        buttonNewGame_Collect.setTranslateX(60);
+        buttonNewGame_Collect.setTranslateY(150);
+        //button2.setFont(new Font("Verdana", 20));
+        buttonMainMenu.setTranslateX(180);
+        buttonMainMenu.setTranslateY(150);
+        //button3.setFont(new Font("Verdana", 20));
+        buttonMainMenu.setMinSize(80, 50);
+        Label labelLost = new Label("Wygląda na to, że przegrałeś. ");
+        Label labelLost1 = new Label("Wybierz jedną z poniższych opcji:");
+        labelLost.setTranslateX(50);
+        labelLost.setTranslateY(50);
+        labelLost.setFont(new Font("Verdana", 20));
+        labelLost1.setTranslateX(30);
+        labelLost1.setTranslateY(100);
+        labelLost1.setFont(new Font("Verdana", 20));
+        layout4.getChildren().addAll(labelLost, labelLost1, buttonNewGame_Collect, buttonMainMenu);
+        scene4 = new Scene(layout4, 400, 220);
 
+        Pane layout5 = new Pane();
+        Button buttonNewGame_Reflex = new Button("Nowa gra");
+        buttonNewGame_Reflex.setMinSize(80, 50);
+        buttonNewGame_Reflex.setTranslateX(60);
+        buttonNewGame_Reflex.setTranslateY(150);
+        layout5.getChildren().addAll(labelLost, labelLost1, buttonNewGame_Reflex, buttonMainMenu);
+        scene5 = new Scene(layout5, 400, 220);
 
-
-
-        button2.setOnAction(new EventHandler<ActionEvent>() {
+        buttonReflex.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 layout3 = new Pane();
@@ -119,40 +147,96 @@ public class Main extends Application
                 window.setScene(scene3);
                 addLabel(layout3);
                 move(scene3);
-                TimeLine2(layout3);
-                AnimationTimer timer;
-                timer = new AnimationTimer(){
+                TimeLine_reflex(layout3);
+                //AnimationTimer timer;
+                timer_reflex = new AnimationTimer(){
                     @Override
                     public void handle(long arg0){
-                        gameUpdate1(layout3);
+                        gameUpdate_Reflex(layout3);
                     }
                 };
-                timer.start();
+                timer_reflex.start();
             }
         });
 
-        button3.setOnAction(new EventHandler<ActionEvent>() {
+        buttonCollect.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                layout2 = new Pane();
-                scene2 = new Scene(layout2, 800, 600);
+                layout2.getChildren().clear();
                 r = shapes.rectangle();
                 layout2.getChildren().add(r);
                 window.setScene(scene2);
-                //addLabel(layout2);
-                gameOne(layout2);
+                newX = 0;
+                gameCollect(layout2);
                 move(scene2);
-                TimeLine(layout2);
-                AnimationTimer timer;
-                timer = new AnimationTimer(){
+                TimeLine_collect(layout2);
+                timer_collect = new AnimationTimer(){
 
                     @Override
                     public void handle(long arg0){
-                        gameUpdate(layout2);
-
+                        gameUpdate_Collect(layout2);
                     }
                 };
-                timer.start();
+                timer_collect.start();
+            }
+        });
+
+        buttonNewGame_Collect.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                timelineCollect.stop();
+                layout2.getChildren().clear();
+                r = shapes.rectangle();
+                layout2.getChildren().add(r);
+                window.setScene(scene2);
+                newX = 0;
+                gameCollect(layout2);
+                move(scene2);
+                TimeLine_collect(layout2);
+
+                timer_collect = new AnimationTimer(){
+
+                    @Override
+                    public void handle(long arg0){
+                        gameUpdate_Collect(layout2);
+                    }
+                };
+                timer_collect.start();
+
+            }
+        });
+
+        buttonNewGame_Reflex.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                timelineReflex.stop();
+                layout3.getChildren().clear();
+                r = shapes.rectangle();
+                layout3.getChildren().add(r);
+                window.setScene(scene3);
+                newX = 0;
+                //gameCollect(layout3);
+                move(scene3);
+                TimeLine_reflex(layout3);
+
+                timer_reflex = new AnimationTimer(){
+
+                    @Override
+                    public void handle(long arg0){
+                        gameUpdate_Reflex(layout3);
+                    }
+                };
+                timer_reflex.start();
+
+            }
+        });
+
+        buttonMainMenu.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                timelineCollect.stop();
+                window.setScene(scene1);
+                window.show();
 
             }
         });
@@ -161,35 +245,33 @@ public class Main extends Application
         window.show();
 
 
-
-
     }
 
-    private void gameUpdate1(Pane x) {
+    private void gameUpdate_Reflex(Pane x) {
 
-
-        //System.out.println(root.getLayoutX());
         for (int i = 0; i < drop.size(); i++) {
-            (drop.get(i)).setLayoutY(( drop.get(i)).getLayoutY() + speed + (drop.get(i)).getLayoutY() / 600);
-
-            //System.out.println(drop.get(i).getLayoutY());
+            System.out.println(drop.get(i).getLayoutY());
+            (drop.get(i)).setLayoutY((drop.get(i)).getLayoutY() + speed + (drop.get(i)).getLayoutY() / 600);
             if ((drop.get(i).getLayoutY() > (r.getY() - 10)) && drop.get(i).getLayoutY() < x.getLayoutY() + 600
                     && drop.get(i).getLayoutX() > (newX + 264) && drop.get(i).getLayoutX() < (newX + 264 + 70)) {
+
                 counterSpeed++;
                 labelCount.setText(String.valueOf(counterSpeed));
                 x.getChildren().remove((drop.get(i)));
                 drop.remove(i);
-            } else {
-                u = new Pair<>(name.getText(), counterSpeed);
-                users.add(u);
-
-
             }
 
+            /* else if ((drop.get(i).getLayoutY() < x.getLayoutY() + 600
+                    && drop.get(i).getLayoutX() > (newX + 264) && drop.get(i).getLayoutX() < (newX + 264 + 70))) {
+                layout3.getChildren().clear();
+                timer_reflex.stop();
+                window.setScene(scene5);
+                window.show();
+            }*/
         }
     }
 
-    private void gameUpdate(Pane x) {
+    private void gameUpdate_Collect(Pane x) {
 
         Circle c = shapes.circle();
         Rectangle s = shapes.square();
@@ -197,54 +279,71 @@ public class Main extends Application
         String circle = String.valueOf(c).substring(0, 1);
         String square = String.valueOf(s).substring(0, 1);
         String triangle = String.valueOf(t).substring(0, 1);
-
-        double speed = 1; //szybkość spadania
-        //System.out.println(root.getLayoutX());
+        speed = 1;
         for (int i = 0; i < drop.size(); i++) {
-            (drop.get(i)).setLayoutY(( drop.get(i)).getLayoutY() + speed + (drop.get(i)).getLayoutY() / 600);
+            (drop.get(i)).setLayoutY((drop.get(i)).getLayoutY() + speed + (drop.get(i)).getLayoutY() / 600);
 
             if ((drop.get(i).getLayoutY() > (r.getY() - 10)) && drop.get(i).getLayoutY() < x.getLayoutY() + 600
                     && drop.get(i).getLayoutX() > (newX + 264) && drop.get(i).getLayoutX() < (newX + 264 + 70)) {
 
-                String object = String.valueOf(drop.get(i)).substring(0,1);
+                String object = String.valueOf(drop.get(i)).substring(0, 1);
                 if (object.equals(circle)) {
-                    if(drop.get(i).getFill() == gameOneCircle.getFill()){
+                    if (drop.get(i).getFill() == gameOneCircle.getFill()) {
                         counterCircle--;
                         labelCountCircle.setText(Integer.toString(counterCircle));
                     } else {
                         System.out.println("PRZEGRANA - KOŁO!!!");
+                        layout2.getChildren().clear();
+                        timer_collect.stop();
+                        window.setScene(scene4);
+                        window.show();
                     }
-                } else if (object.equals(square)){
-                    if(drop.get(i).getFill() == gameOneSquare.getFill()){
+                } else if (object.equals(square)) {
+                    if (drop.get(i).getFill() == gameOneSquare.getFill()) {
                         counterSquare--;
                         labelCountSquare.setText(Integer.toString(counterSquare));
                     } else {
                         System.out.println("PRZEGRANA - KWADRAT!!!");
+                        layout2.getChildren().clear();
+                        timer_collect.stop();
+                        window.setScene(scene4);
+                        window.show();
                     }
-                } else if (object.equals(triangle)){
-                    if(drop.get(i).getFill() == gameOneTriangle.getFill()){
+                } else if (object.equals(triangle)) {
+                    if (drop.get(i).getFill() == gameOneTriangle.getFill()) {
                         counterTriangle--;
                         labelCountTriangle.setText(Integer.toString(counterTriangle));
                     } else {
                         System.out.println("PRZEGRANA - TRÓJKĄT!!!");
+                        layout2.getChildren().clear();
+                        timer_collect.stop();
+                        window.setScene(scene4);
+                        window.show();
                     }
                 }
-                if (counterTriangle == 0 && counterSquare == 0 && counterCircle == 0){
+                if (counterTriangle == 0 && counterSquare == 0 && counterCircle == 0) {
                     System.out.println("WYGRANA!!!");
-                } else if(counterCircle < 0 || counterTriangle < 0 || counterSquare < 0){
+                    drop.clear();
+                } else if (counterCircle < 0 || counterTriangle < 0 || counterSquare < 0) {
                     System.out.println("PRZEGRANA!!!");
+                    drop.clear();
+                    timer_collect.stop();
+                    window.setScene(scene4);
+                    window.show();
                 }
+
                 x.getChildren().remove((drop.get(i)));
                 drop.remove(i);
             }
         }
+
     }
 
-
-
-
-
     private void addLabel(Pane x){
+        drop.clear();
+        newX = 0;
+        speed = 0;
+        falling = 0;
         label = new Label("Licznik: ");
         label.setFont(new javafx.scene.text.Font("Arial", 30));
         label.setTranslateX(610);
@@ -258,7 +357,10 @@ public class Main extends Application
         x.getChildren().add(labelCount);
     }
 
-    private void gameOne(Pane x){
+    private void gameCollect(Pane x){
+        x.getChildren().remove(gameOneCircle);
+        x.getChildren().remove(gameOneSquare);
+        x.getChildren().remove(gameOneTriangle);
         Label collect = new Label("Zbierz:");
         collect.setFont(new Font("Arial", 30));
         collect.setTranslateX(610);
@@ -299,9 +401,12 @@ public class Main extends Application
         x.getChildren().add(labelCountTriangle);
     }
 
-    private void TimeLine(Pane x){
-        double falling = 3000; //określenie częstotliwości spadania (ms)
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(falling), event -> {
+    private void TimeLine_collect(Pane x){
+        drop.clear();
+        //speed = 0;
+        falling = 3000;
+        //double falling = 3000; //określenie częstotliwości spadania (ms)
+        timelineCollect = new Timeline(new KeyFrame(Duration.millis(falling), event -> {
             //speed += falling / 1000;
             int random = (int)(Math.random() * 100);
             if(random < 30)
@@ -313,32 +418,36 @@ public class Main extends Application
             x.getChildren().add((drop.get(drop.size() - 1)));
 
         }));
-        timeline.setCycleCount(1000);
-        timeline.play();
+        timelineCollect.setCycleCount(1000);
+        timelineCollect.play();
     }
 
-    public void TimeLine2(Pane x){
+    private void TimeLine_reflex(Pane x){
+        drop.clear();
+        speed = 1;
+        System.out.println(speed);
         falling = 2000; //określenie częstotliwości spadania (ms)
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(falling), event -> {
-                if (speed < 1.8)
-                    speed += 0.05;
-                //System.out.println(speed);
-                int random = (int) (Math.random() * 100);
-                if (random < 30)
-                    drop.add(shapes.circle());
-                else if (random > 30 && random < 60)
-                    drop.add(shapes.square());
-                else
-                    drop.add(shapes.triangle());
-                x.getChildren().add((drop.get(drop.size() - 1)));
-                //falling -= 500;
-                //System.out.println(falling);
-                System.out.println(falling);
-                if (falling > 1000)
-                    falling -= 150;
+        timelineReflex = new Timeline(new KeyFrame(Duration.millis(falling), event -> {
+            if (speed < 2)
+                speed += 0.05;
+            //System.out.println(speed);
+            int random = (int) (Math.random() * 100);
+            if (random < 30)
+                drop.add(shapes.circle());
+            else if (random > 30 && random < 60)
+                drop.add(shapes.square());
+            else
+                drop.add(shapes.triangle());
+            x.getChildren().add((drop.get(drop.size() - 1)));
+            System.out.println(falling);
+            if (falling > 1000)
+                falling -= 150;
         }));
-        timeline.setCycleCount(1000);
-        timeline.play();
+
+        timelineReflex.setCycleCount(1000);
+        timelineReflex.play();
+
+
     }
 
     private void move(Scene x){
@@ -357,7 +466,6 @@ public class Main extends Application
 
         });
     }
-
 
     public static void main(String[] args) {
         launch(args);
