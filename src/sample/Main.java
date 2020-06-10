@@ -1,36 +1,26 @@
 package sample;
 
-import java.io.*;
 import javafx.animation.AnimationTimer;
-import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
-import javafx.scene.control.Label;
-import javafx.scene.shape.Shape;
 import javafx.util.Duration;
-import javafx.scene.control.TextField;
-import javafx.event.ActionEvent;
 import javafx.util.Pair;
 
-import java.io.PrintWriter;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -53,10 +43,12 @@ public class Main extends Application
     public double speed = 1; //szybkość spadania
     public double falling;
     private  TextField name;
-    Pair<String, Integer> u;
+    //Pair<String, Integer> u;
+    Pair<String, String> g;
     private Timeline timelineCollect, timelineReflex;
     private AnimationTimer timer_collect, timer_reflex;
     private Label labelCollect;
+    public Label name1,score1;
 
 
 
@@ -150,6 +142,36 @@ public class Main extends Application
         layout6.getChildren().addAll(labelLostReflex, labelLost1Reflex, buttonNewGame_Reflex, buttonMainMenuReflex);
         scene6 = new Scene(layout6, 400, 220);
 
+        Pane layoutRank = new Pane();
+        Label labelName1 = new Label("Imię |");
+        Label labelScore = new Label("Wynik | ");
+        name1 = new Label();
+        name1.setTranslateX(0);
+        name1.setTranslateY(40);
+        name1.setFont(new Font("Verdana", 20));
+        score1 = new Label();
+        score1.setTranslateX(70);
+        score1.setTranslateY(40);
+        score1.setFont(new Font("Verdana", 20));
+        labelName1.setTranslateX(0);
+        labelName1.setTranslateY(0);
+        labelName1.setFont(new Font("Verdana", 20));
+        labelScore.setTranslateX(70);
+        labelScore.setTranslateY(0);
+        labelScore.setFont(new Font("Verdana", 20));
+
+        layoutRank.getChildren().addAll(labelName1, labelScore, name1);
+        scene5 = new Scene(layoutRank, 600, 600);
+
+        buttonRank.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                window.setScene(scene5);
+                window.show();
+                select();
+            }
+
+        });
 
         buttonReflex.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -266,8 +288,9 @@ public class Main extends Application
         window.setScene(scene1);
         window.show();
 
-
+        connect();
     }
+
 
     private void gameUpdate_Reflex(Pane x) {
 
@@ -283,6 +306,7 @@ public class Main extends Application
                 timer_reflex.stop();
                 window.setScene(scene6);
                 window.show();
+                insertName(name.getText(),labelCount.getText());
             }
             else if((drop.get(i).getLayoutY() > (r.getY() - 10)) && drop.get(i).getLayoutY() < x.getLayoutY() + 600
                     && drop.get(i).getLayoutX() > (newX + 264) && drop.get(i).getLayoutX() < (newX + 264 + 70))
@@ -294,13 +318,6 @@ public class Main extends Application
 
 
             }
-            else {
-                u = new Pair<>(name.getText(), counterSpeed);
-                users.add(u);
-            }
-
-
-
         }
     }
 
@@ -325,7 +342,7 @@ public class Main extends Application
                         counterCircle--;
                         labelCountCircle.setText(Integer.toString(counterCircle));
                     } else {
-                        labelCollect.setText("Wygląda na to, że przegrałeś.");
+                        labelCollect.setText("Wygląda na to, że przegrałeś.... :(");
                         System.out.println("PRZEGRANA - KOŁO!!!");
                         layout2.getChildren().clear();
                         timer_collect.stop();
@@ -338,7 +355,7 @@ public class Main extends Application
                         labelCountSquare.setText(Integer.toString(counterSquare));
                     } else {
 
-                        labelCollect.setText("Wygląda na to, że przegrałeś... :(.");
+                        labelCollect.setText("Wygląda na to, że przegrałeś... :(");
                         System.out.println("PRZEGRANA - KWADRAT!!!");
                         layout2.getChildren().clear();
                         timer_collect.stop();
@@ -510,6 +527,81 @@ public class Main extends Application
             }
 
         });
+    }
+
+
+///baza do rankingu
+
+    public Connection connect() {
+        // SQLite connection string
+        String url = "jdbc:sqlite:C://sqlite/db/gra.db";
+        Connection conn = null;
+        // SQL statement for creating a new table
+        String sql = "CREATE TABLE IF NOT EXISTS user (\n"
+                + "	id integer PRIMARY KEY,\n"
+                + "	name text NOT NULL,\n"
+                + "	score text NOT NULL\n"
+                + ");";
+
+        try{
+            conn = DriverManager.getConnection(url);
+            Statement stmt = conn.createStatement();
+            System.out.println("Connected to Database");
+            // create a new table
+            stmt.execute(sql);
+            //stmt.execute("insert into user (name) values ('kot')");
+            //stmt.execute("insert into user (name) values ('ryba')");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            //  return null;
+        }
+        return conn;
+    }
+
+    public void insertName(String name,String score) {
+        String sql = "insert into user (name,score) values ('"+ name +"','"+ score +"')";
+
+        try (Connection conn = this.connect();
+             Statement pstmt = conn.createStatement()) {
+            // pstmt.setString(1, name);
+            pstmt.execute(sql);
+            System.out.println("Inserted");
+            ResultSet rs = pstmt.executeQuery("select * from user");
+            while(rs.next()){
+                System.out.println(rs.getInt("id") + " " + rs.getString("name")+ " " + rs.getString("score"));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+
+    public void select(){
+
+        try (Connection conn = this.connect();
+             Statement pstmt = conn.createStatement()) {
+            ArrayList<Pair> user = new ArrayList<>();
+            String name,score;
+            int id;
+            ResultSet rs = pstmt.executeQuery("select * from user");      //wyswietlenie indeksu i imienia
+            while(rs.next()){
+                id=rs.getInt("id");
+                name = rs.getString(("name"));
+                score= rs.getString("score");
+                // name1.setText(name);
+                // score1.setText(score);
+                System.out.println(rs.getInt("id") + " " + rs.getString("name") + " " + rs.getString("score"));
+                //String a = rs.getString("name") + "\t   " + rs.getString("score");
+                // name1.setText(a);
+                g = new Pair<>(name, score);
+                user.add(g);
+
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     public static void main(String[] args) {
