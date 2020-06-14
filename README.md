@@ -16,11 +16,19 @@ Dodatkowo pozwala na stworzenie rankingu graczy - po podaniu imienia punkty z gr
 ![Ekran główny](https://raw.githubusercontent.com/OlaStawarz/JavaFXGame/master/Images/mainstage.PNG) <br/>
 
 ### Zbieranie ###
-W trybie zbieranie losowo generowane są warunki, które gracz musi spełnić, aby wygrać. Może być to np. zebranie 5 niebieskich kół, 5 zielonych trójkątów i 5 czerwonych kwadratów. Zebranie elementu nie spełniającego warunków gry lub przekroczenie liczby elementów do zebrania skutkuje przegraną.
+W trybie zbieranie losowo generowane są warunki, które gracz musi spełnić, aby wygrać. Może być to np. zebranie 5 niebieskich kół, 5 zielonych trójkątów i 5 czerwonych kwadratów. Zebranie elementu nie spełniającego warunków gry lub przekroczenie liczby elementów do zebrania skutkuje przegraną. </br>
+![Tryb rozgrywki - zbieranie](https://raw.githubusercontent.com/OlaStawarz/JavaFXGame/master/Images/collectgame.PNG) <br/>
 
 ### Refleks ###
-W grze refleks użytkownik musi łapać wszystkie spadające elementy do "koszyka" - w przypadku ominięcia jednego z nich gra kończy się.
-![Tryb rozgrywki - zbieranie](https://raw.githubusercontent.com/OlaStawarz/JavaFXGame/master/Images/collectgame.PNG) <br/>
+W grze refleks użytkownik musi łapać wszystkie spadające elementy - w przypadku ominięcia jednego z nich gra kończy się. </br>
+![Tryb rozgrywki - refleks](https://raw.githubusercontent.com/OlaStawarz/JavaFXGame/master/Images/reflex.PNG) <br/>
+
+### Przegranie/wygranie
+![Wygrana](https://raw.githubusercontent.com/OlaStawarz/JavaFXGame/master/Images/win.PNG) <br/>
+![Przegrana](https://raw.githubusercontent.com/OlaStawarz/JavaFXGame/master/Images/lost.PNG) <br/>
+
+### Ranking 
+W budowie
 
 ## Zrealizowane zadania ##
 - [x] Stworzenie planszy
