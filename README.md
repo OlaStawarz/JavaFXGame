@@ -7,7 +7,7 @@
 - Agata Mazur
 - Jagoda Kubacka
 ## Opis gry ##
-Gra stworzona przy użyciu technologii JavaFX polegająca na łapaniu spadających elementów w różnych kształtach i kolorach. Gracz porusza koszykiem w dolnej częsci ekranu przy pomocy strzałek prawo-lewo nakierowując swój "koszyk" w odpowiednie miejsce na ekranie. Posiada dwa tryby rozgrywki:
+Gra stworzona przy użyciu technologii JavaFX polegająca na łapaniu spadających elementów w różnych kształtach i kolorach. Gracz porusza koszykiem w dolnej częsci ekranu przy pomocy strzałek prawo-lewo nakierowując swój "koszyk" w odpowiednie miejsce na ekranie. Gra posiada dwa tryby rozgrywki:
 - refleks 
 - zbieranie </br>
 Dodatkowo pozwala na stworzenie rankingu graczy - po podaniu imienia punkty z gry refleks są zapisywane i wyświetlane w osobnym oknie.
@@ -23,7 +23,8 @@ W trybie zbieranie losowo generowane są warunki, które gracz musi spełnić, a
 W grze refleks użytkownik musi łapać wszystkie spadające elementy - w przypadku ominięcia jednego z nich gra kończy się. </br>
 ![Tryb rozgrywki - refleks](https://raw.githubusercontent.com/OlaStawarz/JavaFXGame/master/Images/reflex.PNG) <br/>
 
-### Przegranie/wygranie
+### Wygrana/przegrana
+W trybie zbieranie możliwa jest przegrana lub wygrana, natomiast w trybie reklaks liczy się ilość zebranych elementów, które póżniej można porównać z wynikami innych graczy. Po zakończeniu rozgrywki możliwe jest ponowne rozegranie lub powrót do menu głównego. </br>
 ![Wygrana](https://raw.githubusercontent.com/OlaStawarz/JavaFXGame/master/Images/win.PNG) <br/>
 ![Przegrana](https://raw.githubusercontent.com/OlaStawarz/JavaFXGame/master/Images/lost.PNG) <br/>
 
