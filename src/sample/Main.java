@@ -4,29 +4,35 @@ import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
-public class Main extends Application
-{
+public class Main extends Application {
     private Stage window;
     private Rectangle r, squareCollect;
     private Circle circleCollect;
@@ -52,9 +58,10 @@ public class Main extends Application
 
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
 
         window = primaryStage;
+        window.setTitle("TRÓJKĄTY I KWADRATY");
         Pane layoutMain = new Pane();
         Button buttonReflex = new Button("REFLEKS");
         Button buttonCollect = new Button("ZBIERANIE");
@@ -85,7 +92,7 @@ public class Main extends Application
         buttonRank.setTranslateX(250);
         buttonRank.setTranslateY(400);
 
-        layoutMain.getChildren().addAll(labelName, labelGame, name, buttonReflex, buttonCollect, buttonRank,shapes.rectangleMain(),  shapes.circleMain(), shapes.triangleMain(),
+        layoutMain.getChildren().addAll(labelName, labelGame, name, buttonReflex, buttonCollect, buttonRank, shapes.rectangleMain(), shapes.circleMain(), shapes.triangleMain(),
                 shapes.circleMain1(), shapes.rectangleMain1(), shapes.triangleMain1(), shapes.circleMain2(), shapes.triangleMain2(), shapes.circleMain3(), shapes.rectangleMain2(),
                 shapes.triangleMain3(), shapes.rectangleMain3(), shapes.circleMain4(), shapes.triangleMain4(), shapes.rectangleMain4());
         scene1 = new Scene(layoutMain, 600, 600);
@@ -121,7 +128,7 @@ public class Main extends Application
         labelCollect = new Label();
         Label labelCollectMessage = new Label("Wybierz jedną z poniższych opcji:");
 
-        Label labelLostReflex = new Label("Wygląda na to, że przegrałeś... :( " );
+        Label labelLostReflex = new Label("Wygląda na to, że przegrałeś... :( ");
         Label labelLost1Reflex = new Label("Wybierz jedną z poniższych opcji:");
         labelCollect.setTranslateX(30);
         labelCollect.setTranslateY(50);
@@ -161,12 +168,55 @@ public class Main extends Application
         layoutRank.getChildren().addAll(labelName1, labelScore, name1);
         scene5 = new Scene(layoutRank, 600, 600);
 
+
+
         buttonRank.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                window.setScene(scene5);
+                ObservableList<Controller> data;
+
+
+                Label label = new Label("Ranking");
+                label.setTextFill(Color.DARKBLUE);
+                label.setFont(Font.font("Calibri", FontWeight.BOLD, 36));
+                HBox hb = new HBox();
+                hb.setAlignment(Pos.CENTER);
+                hb.getChildren().add(label);
+
+                TableView tab = new TableView();
+
+                TableColumn nameColumn = new TableColumn("Name");
+                nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+                nameColumn.setStyle( "-fx-alignment: CENTER;");
+
+                TableColumn scoreColumn = new TableColumn("Score");
+                scoreColumn.setCellValueFactory(new PropertyValueFactory<>("score"));
+                scoreColumn.setStyle( "-fx-alignment: CENTER;");
+
+
+                tab.getColumns().addAll(nameColumn, scoreColumn);
+                tab.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+                data = select();
+                tab.setItems(data);
+
+                Button menu = new Button("Powrót do menu");
+                VBox vbox = new VBox(hb, tab, menu);
+                vbox.setPadding(new Insets(25, 25, 25, 25));;
+                Scene scene = new Scene(vbox);
+
+                window.setScene(scene);
                 window.show();
-                select();
+
+                menu.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent actionEvent) {
+                        window.setScene(scene1);
+                        window.show();
+                    }
+                });
+
+
             }
 
         });
@@ -174,23 +224,31 @@ public class Main extends Application
         buttonReflex.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                layout3 = new Pane();
-                scene3 = new Scene(layout3, 800, 600);
-                r = shapes.rectangle();
-                layout3.getChildren().add(r);
-                window.setScene(scene3);
-                newX = 0;
-                counterSpeed = 0;
-                addLabel(layout3);
-                move(scene3);
-                TimeLine_reflex(layout3);
-                timer_reflex = new AnimationTimer(){
-                    @Override
-                    public void handle(long arg0){
-                        gameUpdate_Reflex(layout3);
-                    }
-                };
-                timer_reflex.start();
+                if (name.getText().isEmpty()){
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Uwaga!");
+                    alert.setHeaderText("Podaj swoje imię!");
+                    alert.showAndWait();
+                } else {
+                    layout3 = new Pane();
+                    scene3 = new Scene(layout3, 800, 600);
+                    r = shapes.rectangle();
+                    layout3.getChildren().add(r);
+                    window.setScene(scene3);
+                    newX = 0;
+                    counterSpeed = 0;
+                    addLabel(layout3);
+                    move(scene3);
+                    TimeLine_reflex(layout3);
+                    timer_reflex = new AnimationTimer() {
+                        @Override
+                        public void handle(long arg0) {
+                            gameUpdate_Reflex(layout3);
+                        }
+                    };
+                    timer_reflex.start();
+                }
+
             }
         });
 
@@ -205,10 +263,10 @@ public class Main extends Application
                 gameCollect(layout2);
                 move(scene2);
                 TimeLine_collect(layout2);
-                timer_collect = new AnimationTimer(){
+                timer_collect = new AnimationTimer() {
 
                     @Override
-                    public void handle(long arg0){
+                    public void handle(long arg0) {
                         gameUpdate_Collect(layout2);
                     }
                 };
@@ -229,10 +287,10 @@ public class Main extends Application
                 move(scene2);
                 TimeLine_collect(layout2);
 
-                timer_collect = new AnimationTimer(){
+                timer_collect = new AnimationTimer() {
 
                     @Override
-                    public void handle(long arg0){
+                    public void handle(long arg0) {
                         gameUpdate_Collect(layout2);
                     }
                 };
@@ -244,24 +302,32 @@ public class Main extends Application
         buttonNewGame_Reflex.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                timelineReflex.stop();
-                layout3.getChildren().clear();
-                r = shapes.rectangle();
-                layout3.getChildren().add(r);
-                window.setScene(scene3);
-                newX = 0;
-                counterSpeed = 0;
-                addLabel(layout3);
-                move(scene3);
-                TimeLine_reflex(layout3);
-                //AnimationTimer timer;
-                timer_reflex = new AnimationTimer(){
-                    @Override
-                    public void handle(long arg0){
-                        gameUpdate_Reflex(layout3);
-                    }
-                };
-                timer_reflex.start();
+                if (name.getText().isEmpty()){
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Uwaga!");
+                    alert.setHeaderText("Podaj swoje imię!");
+                    alert.showAndWait();
+                } else {
+
+                    timelineReflex.stop();
+                    layout3.getChildren().clear();
+                    r = shapes.rectangle();
+                    layout3.getChildren().add(r);
+                    window.setScene(scene3);
+                    newX = 0;
+                    counterSpeed = 0;
+                    addLabel(layout3);
+                    move(scene3);
+                    TimeLine_reflex(layout3);
+                    //AnimationTimer timer;
+                    timer_reflex = new AnimationTimer() {
+                        @Override
+                        public void handle(long arg0) {
+                            gameUpdate_Reflex(layout3);
+                        }
+                    };
+                    timer_reflex.start();
+                }
             }
         });
 
@@ -306,11 +372,9 @@ public class Main extends Application
                 timer_reflex.stop();
                 window.setScene(scene6);
                 window.show();
-                insertName(name.getText(),labelCount.getText());
-            }
-            else if((drop.get(i).getLayoutY() > (r.getY() - 10)) && drop.get(i).getLayoutY() < x.getLayoutY() + 600
-                    && drop.get(i).getLayoutX() > (newX + 264) && drop.get(i).getLayoutX() < (newX + 264 + 70))
-            {
+                insertName(name.getText(), labelCount.getText());
+            } else if ((drop.get(i).getLayoutY() > (r.getY() - 10)) && drop.get(i).getLayoutY() < x.getLayoutY() + 600
+                    && drop.get(i).getLayoutX() > (newX + 264) && drop.get(i).getLayoutX() < (newX + 264 + 70)) {
                 counterSpeed++;
                 labelCount.setText(String.valueOf(counterSpeed));
                 x.getChildren().remove((drop.get(i)));
@@ -401,7 +465,7 @@ public class Main extends Application
 
     }
 
-    private void addLabel(Pane x){
+    private void addLabel(Pane x) {
         labelCountText = new Label("Licznik: ");
         labelCountText.setFont(new javafx.scene.text.Font("Arial", 30));
         labelCountText.setTranslateX(610);
@@ -415,7 +479,7 @@ public class Main extends Application
         x.getChildren().add(labelCount);
     }
 
-    private void gameCollect(Pane x){
+    private void gameCollect(Pane x) {
         x.getChildren().remove(circleCollect);
         x.getChildren().remove(squareCollect);
         x.getChildren().remove(triangleCollect);
@@ -459,15 +523,15 @@ public class Main extends Application
         x.getChildren().add(labelCountTriangle);
     }
 
-    private void TimeLine_collect(Pane x){
+    private void TimeLine_collect(Pane x) {
         drop.clear();
         //speed = 0;
         falling = 1800;
         //double falling = 3000; //określenie częstotliwości spadania (ms)
         timelineCollect = new Timeline(new KeyFrame(Duration.millis(falling), event -> {
             //speed += falling / 1000;
-            int random = (int)(Math.random() * 100);
-            if(random < 30)
+            int random = (int) (Math.random() * 100);
+            if (random < 30)
                 drop.add(shapes.circle());
             else if (random > 30 && random < 60)
                 drop.add(shapes.square());
@@ -481,7 +545,7 @@ public class Main extends Application
     }
 
 
-    private void TimeLine_reflex(Pane x){
+    private void TimeLine_reflex(Pane x) {
         drop.clear();
         speed = 1;
         System.out.println(speed);
@@ -509,7 +573,7 @@ public class Main extends Application
 
     }
 
-    private void move(Scene x){
+    private void move(Scene x) {
         x.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.RIGHT) {
                 if (newX != 264) {
@@ -540,7 +604,7 @@ public class Main extends Application
                 + "	score text NOT NULL\n"
                 + ");";
 
-        try{
+        try {
             conn = DriverManager.getConnection(url);
             Statement stmt = conn.createStatement();
             System.out.println("Connected to Database");
@@ -555,8 +619,8 @@ public class Main extends Application
         return conn;
     }
 
-    public void insertName(String name,String score) {
-        String sql = "insert into user (name,score) values ('"+ name +"','"+ score +"')";
+    public void insertName(String name, String score) {
+        String sql = "insert into user (name,score) values ('" + name + "','" + score + "')";
 
         try (Connection conn = this.connect();
              Statement pstmt = conn.createStatement()) {
@@ -564,8 +628,8 @@ public class Main extends Application
             pstmt.execute(sql);
             System.out.println("Inserted");
             ResultSet rs = pstmt.executeQuery("select * from user");
-            while(rs.next()){
-                System.out.println(rs.getInt("id") + " " + rs.getString("name")+ " " + rs.getString("score"));
+            while (rs.next()) {
+                System.out.println(rs.getInt("id") + " " + rs.getString("name") + " " + rs.getString("score"));
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -573,33 +637,39 @@ public class Main extends Application
     }
 
 
-    public void select(){
+    public ObservableList select() {
 
         try (Connection conn = this.connect();
              Statement pstmt = conn.createStatement()) {
-            ArrayList<Pair> user = new ArrayList<>();
-            String name,score;
+            List user = new ArrayList();
+            String name, score;
             int id;
-            ResultSet rs = pstmt.executeQuery("select * from user");      //wyswietlenie indeksu i imienia
-            while(rs.next()){
-                id=rs.getInt("id");
+            ResultSet rs = pstmt.executeQuery("select * from user order by score DESC");      //wyswietlenie indeksu i imienia
+            while (rs.next()) {
+                id = rs.getInt("id");
                 name = rs.getString(("name"));
-                score= rs.getString("score");
+                score = rs.getString("score");
                 // name1.setText(name);
                 // score1.setText(score);
-                System.out.println(rs.getInt("id") + " " + rs.getString("name") + " " + rs.getString("score"));
+                //System.out.println(rs.getInt("id") + " " + rs.getString("name") + " " + rs.getString("score"));
                 //String a = rs.getString("name") + "\t   " + rs.getString("score");
                 // name1.setText(a);
-                g = new Pair<>(name, score);
-                user.add(g);
-
+                //  g = new Pair<>(name, score);
+                user.add(new Controller(name,score));
             }
+
+            ObservableList data = FXCollections.observableList(user);
+            //System.out.println(data);
+            return data;
+
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }
 
+        }
+        return null;
     }
+
 
     public static void main(String[] args) {
         launch(args);
