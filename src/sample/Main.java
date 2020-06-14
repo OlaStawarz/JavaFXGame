@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
@@ -27,29 +28,27 @@ import java.util.ArrayList;
 public class Main extends Application
 {
     private Stage window;
-    private Rectangle r, gameOneSquare;
+    private Rectangle r, squareCollect;
+    private Circle circleCollect;
+    private Path triangleCollect;
+
     private Scene scene1, scene2, scene3, scene4, scene5, scene6;
     private double newX = 0;
     private Shapes shapes = new Shapes();
     private ArrayList<Shape> drop = new ArrayList<>();
-    private ArrayList<Pair> users = new ArrayList<>();
     private Label labelCountCircle, labelCountSquare, labelCountTriangle, labelCount;
     private int counterCircle = 5, counterSquare = 5, counterTriangle = 5, counterSpeed = 0;
     private Pane layout2, layout3;
-    private Label label;
-    public AnimationTimer timer;
-    private Circle gameOneCircle;
-    private Path gameOneTriangle;
-    public double speed = 1; //szybkość spadania
-    public double falling;
-    private  TextField name;
-    //Pair<String, Integer> u;
-    Pair<String, String> g;
-    private Timeline timelineCollect, timelineReflex;
-    private AnimationTimer timer_collect, timer_reflex;
-    private Label labelCollect;
-    public Label name1,score1;
+    private Label labelCountText;
 
+    private double speed = 1; //szybkość spadania
+    private double falling;
+    private TextField name;
+    private Pair<String, String> g;
+    private Timeline timelineCollect, timelineReflex, timeline;
+    private AnimationTimer timer_collect, timer_reflex, timerMain;
+    private Label labelCollect;
+    private Label name1, score1;
 
 
     @Override
@@ -86,7 +85,9 @@ public class Main extends Application
         buttonRank.setTranslateX(250);
         buttonRank.setTranslateY(400);
 
-        layoutMain.getChildren().addAll(labelName, labelGame, name, buttonReflex, buttonCollect, buttonRank);
+        layoutMain.getChildren().addAll(labelName, labelGame, name, buttonReflex, buttonCollect, buttonRank,shapes.rectangleMain(),  shapes.circleMain(), shapes.triangleMain(),
+                shapes.circleMain1(), shapes.rectangleMain1(), shapes.triangleMain1(), shapes.circleMain2(), shapes.triangleMain2(), shapes.circleMain3(), shapes.rectangleMain2(),
+                shapes.triangleMain3(), shapes.rectangleMain3(), shapes.circleMain4(), shapes.triangleMain4(), shapes.rectangleMain4());
         scene1 = new Scene(layoutMain, 600, 600);
 
         layout2 = new Pane();
@@ -111,14 +112,11 @@ public class Main extends Application
         buttonNewGame_Reflex.setMinSize(80, 50);
         buttonNewGame_Reflex.setTranslateX(60);
         buttonNewGame_Reflex.setTranslateY(150);
-        //button2.setFont(new Font("Verdana", 20));
         buttonMainMenu.setTranslateX(180);
         buttonMainMenu.setTranslateY(150);
-        //button3.setFont(new Font("Verdana", 20));
         buttonMainMenu.setMinSize(80, 50);
         buttonMainMenuReflex.setTranslateX(180);
         buttonMainMenuReflex.setTranslateY(150);
-        //button3.setFont(new Font("Verdana", 20));
         buttonMainMenuReflex.setMinSize(80, 50);
         labelCollect = new Label();
         Label labelCollectMessage = new Label("Wybierz jedną z poniższych opcji:");
@@ -181,10 +179,11 @@ public class Main extends Application
                 r = shapes.rectangle();
                 layout3.getChildren().add(r);
                 window.setScene(scene3);
+                newX = 0;
+                counterSpeed = 0;
                 addLabel(layout3);
                 move(scene3);
                 TimeLine_reflex(layout3);
-                //AnimationTimer timer;
                 timer_reflex = new AnimationTimer(){
                     @Override
                     public void handle(long arg0){
@@ -251,6 +250,7 @@ public class Main extends Application
                 layout3.getChildren().add(r);
                 window.setScene(scene3);
                 newX = 0;
+                counterSpeed = 0;
                 addLabel(layout3);
                 move(scene3);
                 TimeLine_reflex(layout3);
@@ -338,7 +338,7 @@ public class Main extends Application
 
                 String object = String.valueOf(drop.get(i)).substring(0, 1);
                 if (object.equals(circle)) {
-                    if (drop.get(i).getFill() == gameOneCircle.getFill()) {
+                    if (drop.get(i).getFill() == circleCollect.getFill()) {
                         counterCircle--;
                         labelCountCircle.setText(Integer.toString(counterCircle));
                     } else {
@@ -350,7 +350,7 @@ public class Main extends Application
                         window.show();
                     }
                 } else if (object.equals(square)) {
-                    if (drop.get(i).getFill() == gameOneSquare.getFill()) {
+                    if (drop.get(i).getFill() == squareCollect.getFill()) {
                         counterSquare--;
                         labelCountSquare.setText(Integer.toString(counterSquare));
                     } else {
@@ -363,7 +363,7 @@ public class Main extends Application
                         window.show();
                     }
                 } else if (object.equals(triangle)) {
-                    if (drop.get(i).getFill() == gameOneTriangle.getFill()) {
+                    if (drop.get(i).getFill() == triangleCollect.getFill()) {
                         counterTriangle--;
                         labelCountTriangle.setText(Integer.toString(counterTriangle));
                     } else {
@@ -402,15 +402,11 @@ public class Main extends Application
     }
 
     private void addLabel(Pane x){
-        drop.clear();
-        newX = 0;
-        speed = 0;
-        falling = 0;
-        label = new Label("Licznik: ");
-        label.setFont(new javafx.scene.text.Font("Arial", 30));
-        label.setTranslateX(610);
-        label.setTranslateY(100);
-        x.getChildren().add(label);
+        labelCountText = new Label("Licznik: ");
+        labelCountText.setFont(new javafx.scene.text.Font("Arial", 30));
+        labelCountText.setTranslateX(610);
+        labelCountText.setTranslateY(100);
+        x.getChildren().add(labelCountText);
 
         labelCount = new Label("0");
         labelCount.setFont(new Font("Arial", 30));
@@ -420,19 +416,19 @@ public class Main extends Application
     }
 
     private void gameCollect(Pane x){
-        x.getChildren().remove(gameOneCircle);
-        x.getChildren().remove(gameOneSquare);
-        x.getChildren().remove(gameOneTriangle);
+        x.getChildren().remove(circleCollect);
+        x.getChildren().remove(squareCollect);
+        x.getChildren().remove(triangleCollect);
         Label collect = new Label("Zbierz:");
         collect.setFont(new Font("Arial", 30));
         collect.setTranslateX(610);
         collect.setTranslateY(100);
         x.getChildren().add(collect);
 
-        gameOneCircle = shapes.circle();
-        gameOneCircle.setLayoutX(630);
-        gameOneCircle.setLayoutY(169);
-        x.getChildren().add(gameOneCircle);
+        circleCollect = shapes.circle();
+        circleCollect.setLayoutX(630);
+        circleCollect.setLayoutY(169);
+        x.getChildren().add(circleCollect);
 
         labelCountCircle = new Label("5");
         labelCountCircle.setFont(new Font("Arial", 30));
@@ -440,10 +436,10 @@ public class Main extends Application
         labelCountCircle.setLayoutY(150);
         x.getChildren().add(labelCountCircle);
 
-        gameOneSquare = shapes.square();
-        gameOneSquare.setLayoutX(624);
-        gameOneSquare.setLayoutY(212);
-        x.getChildren().add(gameOneSquare);
+        squareCollect = shapes.square();
+        squareCollect.setLayoutX(624);
+        squareCollect.setLayoutY(212);
+        x.getChildren().add(squareCollect);
 
         labelCountSquare = new Label("5");
         labelCountSquare.setFont(new Font("Arial", 30));
@@ -451,10 +447,10 @@ public class Main extends Application
         labelCountSquare.setLayoutY(200);
         x.getChildren().add(labelCountSquare);
 
-        gameOneTriangle = shapes.triangle();
-        gameOneTriangle.setLayoutX(618);
-        gameOneTriangle.setLayoutY(258);
-        x.getChildren().add(gameOneTriangle);
+        triangleCollect = shapes.triangle();
+        triangleCollect.setLayoutX(618);
+        triangleCollect.setLayoutY(258);
+        x.getChildren().add(triangleCollect);
 
         labelCountTriangle = new Label("5");
         labelCountTriangle.setFont(new Font("Arial", 30));
@@ -484,13 +480,14 @@ public class Main extends Application
         timelineCollect.play();
     }
 
+
     private void TimeLine_reflex(Pane x){
         drop.clear();
         speed = 1;
         System.out.println(speed);
         falling = 2000; //określenie częstotliwości spadania (ms)
         timelineReflex = new Timeline(new KeyFrame(Duration.millis(falling), event -> {
-            if (speed < 2)
+            if (speed < 2.5)
                 speed += 0.05;
             //System.out.println(speed);
             int random = (int) (Math.random() * 100);
