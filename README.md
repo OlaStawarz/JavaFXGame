@@ -9,7 +9,8 @@
 ## Opis gry ##
 Gra stworzona przy użyciu technologii JavaFX polegająca na łapaniu spadających elementów w różnych kształtach i kolorach. Gracz porusza koszykiem w dolnej częsci ekranu przy pomocy strzałek prawo-lewo nakierowując swój "koszyk" w odpowiednie miejsce na ekranie. Gra posiada dwa tryby rozgrywki:
 - refleks 
-- zbieranie </br>
+- zbieranie 
+</br> </br>
 Dodatkowo pozwala na stworzenie rankingu graczy - po podaniu imienia punkty z gry refleks są zapisywane i wyświetlane w osobnym oknie.
 
 ### Ekran główny ###
