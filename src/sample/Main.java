@@ -38,24 +38,26 @@ public class Main extends Application {
     private Circle circleCollect;
     private Path triangleCollect;
 
-    private Scene scene1, scene2, scene3, scene4, scene5, scene6;
-    private double newX = 0;
+    private Database database = new Database();
+
+    private Scene scene1, scene2, scene3, scene4, scene6;
+
     private Shapes shapes = new Shapes();
     private ArrayList<Shape> drop = new ArrayList<>();
-    private Label labelCountCircle, labelCountSquare, labelCountTriangle, labelCount;
+
+    private Label labelCountCircle, labelCountSquare, labelCountTriangle, labelCount,
+            labelCountText, labelCollect, name1, score1;
+
     private int counterCircle = 5, counterSquare = 5, counterTriangle = 5, counterSpeed = 0;
     private Pane layout2, layout3;
-    private Label labelCountText;
 
     private double speed = 1; //szybkość spadania
     private double falling;
+    private double newX = 0;
     private TextField name;
-    private Pair<String, String> g;
-    private Timeline timelineCollect, timelineReflex, timeline;
-    private AnimationTimer timer_collect, timer_reflex, timerMain;
-    private Label labelCollect;
-    private Label name1, score1;
 
+    private Timeline timelineCollect, timelineReflex;
+    private AnimationTimer timer_collect, timer_reflex;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -147,34 +149,10 @@ public class Main extends Application {
         layout6.getChildren().addAll(labelLostReflex, labelLost1Reflex, buttonNewGame_Reflex, buttonMainMenuReflex);
         scene6 = new Scene(layout6, 400, 220);
 
-        Pane layoutRank = new Pane();
-        Label labelName1 = new Label("Imię |");
-        Label labelScore = new Label("Wynik | ");
-        name1 = new Label();
-        name1.setTranslateX(0);
-        name1.setTranslateY(40);
-        name1.setFont(new Font("Verdana", 20));
-        score1 = new Label();
-        score1.setTranslateX(70);
-        score1.setTranslateY(40);
-        score1.setFont(new Font("Verdana", 20));
-        labelName1.setTranslateX(0);
-        labelName1.setTranslateY(0);
-        labelName1.setFont(new Font("Verdana", 20));
-        labelScore.setTranslateX(70);
-        labelScore.setTranslateY(0);
-        labelScore.setFont(new Font("Verdana", 20));
-
-        layoutRank.getChildren().addAll(labelName1, labelScore, name1);
-        scene5 = new Scene(layoutRank, 600, 600);
-
-
-
         buttonRank.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 ObservableList<Controller> data;
-
 
                 Label label = new Label("Ranking");
                 label.setTextFill(Color.DARKBLUE);
@@ -197,7 +175,7 @@ public class Main extends Application {
                 tab.getColumns().addAll(nameColumn, scoreColumn);
                 tab.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-                data = select();
+                data = database.select();
                 tab.setItems(data);
 
                 Button menu = new Button("Powrót do menu");
@@ -350,11 +328,10 @@ public class Main extends Application {
 
             }
         });
-
         window.setScene(scene1);
         window.show();
 
-        connect();
+        database.connect();
     }
 
 
@@ -372,15 +349,13 @@ public class Main extends Application {
                 timer_reflex.stop();
                 window.setScene(scene6);
                 window.show();
-                insertName(name.getText(), labelCount.getText());
+                database.insertName(name.getText(), Integer.parseInt(labelCount.getText()));
             } else if ((drop.get(i).getLayoutY() > (r.getY() - 10)) && drop.get(i).getLayoutY() < x.getLayoutY() + 600
                     && drop.get(i).getLayoutX() > (newX + 264) && drop.get(i).getLayoutX() < (newX + 264 + 70)) {
                 counterSpeed++;
                 labelCount.setText(String.valueOf(counterSpeed));
                 x.getChildren().remove((drop.get(i)));
                 drop.remove(i);
-
-
             }
         }
     }
@@ -525,11 +500,8 @@ public class Main extends Application {
 
     private void TimeLine_collect(Pane x) {
         drop.clear();
-        //speed = 0;
         falling = 1800;
-        //double falling = 3000; //określenie częstotliwości spadania (ms)
         timelineCollect = new Timeline(new KeyFrame(Duration.millis(falling), event -> {
-            //speed += falling / 1000;
             int random = (int) (Math.random() * 100);
             if (random < 30)
                 drop.add(shapes.circle());
@@ -548,12 +520,10 @@ public class Main extends Application {
     private void TimeLine_reflex(Pane x) {
         drop.clear();
         speed = 1;
-        System.out.println(speed);
         falling = 2000; //określenie częstotliwości spadania (ms)
         timelineReflex = new Timeline(new KeyFrame(Duration.millis(falling), event -> {
             if (speed < 2.5)
                 speed += 0.05;
-            //System.out.println(speed);
             int random = (int) (Math.random() * 100);
             if (random < 30)
                 drop.add(shapes.circle());
@@ -566,11 +536,8 @@ public class Main extends Application {
             if (falling > 1000)
                 falling -= 150;
         }));
-
         timelineReflex.setCycleCount(1000);
         timelineReflex.play();
-
-
     }
 
     private void move(Scene x) {
@@ -588,86 +555,6 @@ public class Main extends Application {
             }
 
         });
-    }
-
-
-///baza do rankingu
-
-    public Connection connect() {
-        // SQLite connection string
-        String url = "jdbc:sqlite:C://sqlite/db/gra.db";
-        Connection conn = null;
-        // SQL statement for creating a new table
-        String sql = "CREATE TABLE IF NOT EXISTS user (\n"
-                + "	id integer PRIMARY KEY,\n"
-                + "	name text NOT NULL,\n"
-                + "	score text NOT NULL\n"
-                + ");";
-
-        try {
-            conn = DriverManager.getConnection(url);
-            Statement stmt = conn.createStatement();
-            System.out.println("Connected to Database");
-            // create a new table
-            stmt.execute(sql);
-            //stmt.execute("insert into user (name) values ('kot')");
-            //stmt.execute("insert into user (name) values ('ryba')");
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            //  return null;
-        }
-        return conn;
-    }
-
-    public void insertName(String name, String score) {
-        String sql = "insert into user (name,score) values ('" + name + "','" + score + "')";
-
-        try (Connection conn = this.connect();
-             Statement pstmt = conn.createStatement()) {
-            // pstmt.setString(1, name);
-            pstmt.execute(sql);
-            System.out.println("Inserted");
-            ResultSet rs = pstmt.executeQuery("select * from user");
-            while (rs.next()) {
-                System.out.println(rs.getInt("id") + " " + rs.getString("name") + " " + rs.getString("score"));
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-
-    public ObservableList select() {
-
-        try (Connection conn = this.connect();
-             Statement pstmt = conn.createStatement()) {
-            List user = new ArrayList();
-            String name, score;
-            int id;
-            ResultSet rs = pstmt.executeQuery("select * from user order by score DESC");      //wyswietlenie indeksu i imienia
-            while (rs.next()) {
-                id = rs.getInt("id");
-                name = rs.getString(("name"));
-                score = rs.getString("score");
-                // name1.setText(name);
-                // score1.setText(score);
-                //System.out.println(rs.getInt("id") + " " + rs.getString("name") + " " + rs.getString("score"));
-                //String a = rs.getString("name") + "\t   " + rs.getString("score");
-                // name1.setText(a);
-                //  g = new Pair<>(name, score);
-                user.add(new Controller(name,score));
-            }
-
-            ObservableList data = FXCollections.observableList(user);
-            //System.out.println(data);
-            return data;
-
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-
-        }
-        return null;
     }
 
 

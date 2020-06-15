@@ -1,20 +1,21 @@
 package sample;
 
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 
 public class Controller {
 
     private SimpleStringProperty name;
-    private SimpleStringProperty score;
+    private SimpleIntegerProperty score;
 
     public Controller () {
     }
 
-    public Controller (String s1, String s2) {
+    public Controller (String s1, int s2) {
 
         name = new SimpleStringProperty(s1);
-        score = new SimpleStringProperty(s2);
+        score = new SimpleIntegerProperty(s2);
     }
 
     public String getName() {
@@ -26,11 +27,11 @@ public class Controller {
         name.set(s);
     }
 
-    public String getScore() {
+    public int getScore() {
 
         return score.get();
     }
-    public void setScore(String s) {
+    public void setScore(int s) {
         score.set(s);
     }
 
