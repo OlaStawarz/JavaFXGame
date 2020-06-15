@@ -23,6 +23,8 @@ W trybie zbieranie losowo generowane są warunki, które gracz musi spełnić, a
 ### Refleks ###
 W grze refleks użytkownik musi łapać wszystkie spadające elementy - w przypadku ominięcia jednego z nich gra kończy się. </br>
 ![Tryb rozgrywki - refleks](https://raw.githubusercontent.com/OlaStawarz/JavaFXGame/master/Images/reflex.PNG) <br/>
+Z uwagi na ranking dodano komunikat, który pojawia się w sytuacji, gdy gracz nie podał imienia w wymaganym polu. </br>
+![Komunikat](https://raw.githubusercontent.com/OlaStawarz/JavaFXGame/master/Images/error.PNG) <br/>
 
 ### Wygrana/przegrana
 W trybie zbieranie możliwa jest przegrana lub wygrana, natomiast w trybie rekleks liczy się ilość zebranych elementów, które póżniej można porównać z wynikami innych graczy. Po zakończeniu rozgrywki możliwe jest jej ponowne rozegranie lub powrót do menu głównego. </br>
@@ -30,7 +32,9 @@ W trybie zbieranie możliwa jest przegrana lub wygrana, natomiast w trybie rekle
 ![Przegrana](https://raw.githubusercontent.com/OlaStawarz/JavaFXGame/master/Images/lost.PNG) <br/>
 
 ### Ranking 
-W budowie
+Utworzony ranking sortuje wynik od najlepszego do najgorszego. </br>
+![Ranking](https://raw.githubusercontent.com/OlaStawarz/JavaFXGame/master/Images/ranking.PNG) <br/>
+
 
 ## Zrealizowane zadania ##
 - [x] Stworzenie planszy
@@ -40,5 +44,5 @@ W budowie
 - [x] Oprogramowanie dwóch trybów rozgrywki
 - [x] Dodanie warunków pozwalających na wygranie oraz przegranie
 - [x] Połączenie z bazą danych SQLite
-- [ ] Wyświetlanie rankingu
-- [ ] Wizualne uatrakcyjnienie poszczególnych ekranów
+- [x] Wyświetlanie rankingu
+- [x] Wizualne uatrakcyjnienie poszczególnych ekranów
